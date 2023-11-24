@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>ECサイト</title>
+
+    <script>
+      let cartList = [];
+
+      document.addEventListener("DOMContentLoaded", e => {
+        document
+          .getElementById("loginForm")
+          .addEventListener("submit", loginHandler);
+
+        const cartBtns = document.querySelectorAll(".cartbtn");
+        cartBtns.forEach(btn => {
+          btn.addEventListener("click", addCartHandler);
+        });
+
+        document
+          .getElementById("purchaseBtn")
+          .addEventListener("click", purchaseHandler);
+
+        document
+          .getElementById("historyBtn")
+          .addEventListener("click", showHistoryHandler);
+      });
+
+      const initCart = () => {
+        const tbody = document.querySelector("#cart tbody");
+        while (tbody.lastChild) {
+          tbody.removeChild(tbody.lastChild);
+        }
+      };
+
+      const addCartHandler = e => {
+        const tdList =
+          e.target.parentElement.parentElement.querySelectorAll("td");
+
+        const goodsInfo = {
+          id: tdList.item(0).innerText,
+          goodsName: tdList.item(1).innerText,
+          price: tdList.item(2).innerText,
+          count: tdList.item(3).querySelector("input").value,
+        };
+
+        if (goodsInfo.count === "0" || goodsInfo.count === "") {
+          alert("注文数が0または空欄です。");
+          return;
+        }
+
+        cartList.push(goodsInfo);
+
+        initCart();
+
+        cartList.forEach(cart => {
+          const tr = document.createElement("tr");
+
+          Object.values(cart).forEach(value => {
+            const td = document.createElement("td");
+            td.innerText = value;
+            tr.appendChild(td);
+          });
+
+          const removeBtn = document.createElement("button");
+          removeBtn.innerText = "カート削除";
+          removeBtn.setAttribute("class", "removeBtn");
+          removeBtn.addEventListener("click", removeCartHandler);
+
+          const td = document.createElement("td");
+          td.appendChild(removeBtn);
+          tr.appendChild(td);
+
+          const tbody = document.querySelector("#cart tbody");
+          tbody.appendChild(tr);
+        });
+      };
+
+      const removeCartHandler = e => {
+        const tr = e.target.parentElement.parentElement;
+        const tdList = tr.querySelectorAll("td");
+        const id = tdList.item(0).innerText;
+
+        cartList = cartList.filter(cart => cart.id !== id);
+
+        while (tr.lastChild) {
+          tr.removeChild(tr.lastChild);
+        }
+      };
+
+      const loginHandler = async e => {
+        e.preventDefault();
+
+        initCart();
+        cartList = [];
+
+        const postObj = {
+          userName: document.querySelector("input[name=userName]").value,
+          password: document.querySelector("input[name=password]").value,
+        };
+
+        const res = await fetch("/ecsite/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(postObj),
+        });
+
+        const result = await res.text();
+
+        const user = JSON.parse(result);
+        document.getElementById(
+          "welcome"
+        ).innerText = `ようこそ！ ${user.fullName} さん`;
+        document.getElementById("hiddenUserId").value = user.id;
+        document.querySelector("input[name=userName]").value = "";
+        document.querySelector("input[name=password]").value = "";
+      };
+
+      const purchaseHandler = async e => {
+        const postObj = {
+          userId: document.getElementById("hiddenUserId").value,
+          cartList,
+        };
+
+        try {
+          const res = await fetch("/ecsite/api/purchase", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(postObj),
+          });
+
+          const result = await res.text();
+
+          alert(`${result}種類の商品を購入しました`);
+          const countElements = document.querySelectorAll(".count");
+          countElements.forEach(elm => (elm.value = 0));
+
+          initCart();
+          cartList = [];
+        } catch (e) {
+          console.error("Error: ", e);
+        }
+      };
+
+      const showHistoryHandler = async e => {
+        const postObj = {
+          userId: document.getElementById("hiddenUserId").value,
+        };
+
+        try {
+          const res = await fetch("/ecsite/api/history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(postObj),
+          });
+
+          const result = await res.text();
+
+          const historyList = JSON.parse(result);
+
+          const tbody = document.querySelector("#history tbody");
+          while (tbody.lastChild) {
+            tbody.removeChild(tbody.lastChild);
+          }
+
+          historyList.forEach((history, index) => {
+            const tr = document.createElement("tr");
+            const keys = ["goodsName", "itemCount", "createdAt"];
+
+            keys.forEach(key => {
+              const td = document.createElement("td");
+              td.innerText = history[key];
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Error: ", e);
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>ECサイト</h1>
+      <div>
+        <form action="#" name="loginForm" method="post" id="loginForm">
+          <label for="userName">ユーザー名：</label>
+          <input type="text" name="userName" id="userName" />
+          <label for="password">パスワード：</label>
+          <input type="password" name="password" id="password" />
+          <button type="submit">ログイン</button>
+        </form>
+
+        <span id="welcome">ようこそ！　ゲストさん</span>
+        <input type="hidden" id="hiddenUserId" value="0" />
+      </div>
+    </header>
+
+    <table id="goodsListTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>商品名</th>
+          <th>価格</th>
+          <th>注文数</th>
+          <th>カート</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="item : ${goods}">
+          <td th:text="${item.id}"></td>
+          <td th:text="${item.goodsName}"></td>
+          <td th:text="${item.price}"></td>
+          <td><input type="number" value="0" class="count" /></td>
+          <td><button class="cartbtn">カートに入れる</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <fieldset>
+      <legend>カート</legend>
+      <table id="cart">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>商品名</th>
+            <th>価格</th>
+            <th>注文数</th>
+            <th>カート</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="purchaseBtn">購入</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>購入履歴</legend>
+      <table id="history">
+        <thead>
+          <tr>
+            <th>商品名</th>
+            <th>注文数</th>
+            <th>購入日時</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="historyBtn">履歴を表示</button>
+    </fieldset>
+  </body>
+</html>

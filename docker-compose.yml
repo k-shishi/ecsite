@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  db:
+    image: mysql:latest
+    container_name: ecsitedb_container
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - TZ=Asia/Tokyo
+    volumes:
+      - ./mysql:/etc/mysql/conf.d
+      - ./mysql/sql:/etc/mysql/sql

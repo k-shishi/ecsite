@@ -1,0 +1,160 @@
+@charset "UTF-8";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+input[type="number"] {
+  text-align: right;
+}
+
+/* ----------header---------- */
+header {
+  display: flex;
+  background-color: green;
+  color: white;
+  height: 70px;
+}
+
+header h1 {
+  margin: 0 0 0 20px;
+}
+
+header div {
+  margin: 10px 20px 0 auto;
+  text-align: right;
+}
+
+/* ----------form---------- */
+input[name="userName"],
+input[name="password"] {
+  width: 100px;
+}
+
+/* ----------table---------- */
+table {
+  margin: 20px;
+  border-collapse: collapse;
+}
+
+table td,
+table th {
+  border: 1px solid grey;
+}
+
+th {
+  background: green;
+  color: white;
+}
+
+th:nth-child(1) {
+  width: 30px;
+}
+th:nth-child(2) {
+  width: 150px;
+}
+th:nth-child(3) {
+  width: 120px;
+}
+th:nth-child(4) {
+  width: 60px;
+}
+th:nth-child(5) {
+  width: 120px;
+}
+
+td:nth-child(1) {
+  text-align: right;
+}
+td:nth-child(2) {
+  text-align: left;
+}
+td:nth-child(3) {
+  text-align: right;
+}
+td:nth-child(4) {
+  text-align: center;
+}
+td:nth-child(5) {
+  text-align: center;
+}
+
+td input {
+  width: 85%;
+  text-align: right;
+}
+
+table#cart thead tr th,
+table#history thead tr th {
+  background-color: #c0c0c0 !important;
+  color: black;
+}
+
+table#history thead tr th:nth-child(1) {
+  width: 150px;
+}
+table#history thead tr th:nth-child(2) {
+  width: 65px;
+}
+table#history thead tr th:nth-child(3) {
+  width: 250px;
+}
+
+table#history tbody tr th:nth-child(1) {
+  padding: 0 5px;
+  text-align: left;
+}
+table#history tbody tr th:nth-child(1) {
+  padding: 0 5px;
+  text-align: right;
+}
+
+table#history tbody tr th:nth-child(1) {
+  padding: 0 5px;
+  text-align: left;
+}
+
+/* ----------Admin Login Page---------- */
+#adminPage {
+  margin: 0 30px;
+}
+
+/* ----------Admin Table---------- */
+table#adminTable thead rt th:nth-child(1) {
+  width: 50px;
+}
+table#adminTable thead rt th:nth-child(2) {
+  width: 150px;
+}
+table#adminTable thead rt th:nth-child(3) {
+  width: 100px;
+}
+table#adminTable thead rt th:nth-child(4) {
+  width: 80px;
+}
+
+table#adminTable tbody rt th:nth-child(1) {
+  padding: 0 5px;
+  text-align: right;
+}
+table#adminTable tbody rt th:nth-child(2) {
+  padding: 0 5px;
+  text-align: left;
+}
+table#adminTable tbody rt th:nth-child(3) {
+  padding: 0 5px;
+  text-align: right;
+}
+table#adminTable tbody rt th:nth-child(4) {
+  text-align: center;
+}
+
+/* ----------Error Message---------- */
+.error {
+  color: red;
+}

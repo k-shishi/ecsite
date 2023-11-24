@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EC Site 管理者ページ</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>EC Site -- 管理者ページ</h1>
+    </header>
+
+    <div id="adminPage">
+      <h2>管理者ログイン</h2>
+      <form action="/ecsite/admin/welcome" name="loginForm" method="post">
+        <p>ユーザー名: <input type="text" name="userName" /></p>
+        <p>パスワード: <input type="password" name="password" /></p>
+        <button type="submit">ログイン</button>
+      </form>
+    </div>
+  </body>
+</html>

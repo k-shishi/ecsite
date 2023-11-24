@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EC Site 管理者ページ</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script>
+      document.addEventListener("DOMContentLoaded", e => {
+        const deleteBtns = document.querySelectorAll(".deleteBtn");
+        deleteBtns.forEach(btn => {
+          btn.addEventListener("click", e => {
+            let isOk = confirm("削除してもよろしいですか？");
+            if (!isOk) return;
+
+            const tdList =
+              e.target.parentElement.parentElement.querySelectorAll("td");
+            deleteGoods(tdList);
+          });
+        });
+      });
+
+      const deleteGoods = async tdList => {
+        const postObj = { id: tdList.item(0).innerText };
+        console.log(postObj);
+
+        try {
+          const res = await fetch("/ecsite/admin/api/deleteGoods", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(postObj),
+          });
+
+          const result = await res.text();
+          if (result === "-1") {
+            throw new Error("Something went wrong.");
+          }
+
+          alert(`商品 [ ${tdList.item(1).innerText} ] を削除しました。`);
+          tdList.item(0).parentElement.remove();
+        } catch (e) {
+          console.error("Error: ", e);
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>EC Site -- 管理者ページ</h1>
+    </header>
+
+    <table id="adminTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>商品名</th>
+          <th>価格</th>
+          <th>削除</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="item: ${goods}">
+          <td th:text="${item.id}"></td>
+          <td th:text="${item.goodsName}"></td>
+          <td th:text="${item.price}"></td>
+          <td><button type="submit" class="deleteBtn">削除</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <form
+      action="/ecsite/admin/goodsMst"
+      name="goodsForm"
+      method="post"
+      id="adminPage"
+    >
+      <button type="submit" th:if="${userName != null}">新規商品追加</button>
+      <input type="hidden" name="userName" th:value="${userName}" />
+      <input type="hidden" name="password" th:value="${password}" />
+    </form>
+  </body>
+</html>
